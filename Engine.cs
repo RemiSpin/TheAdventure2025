@@ -159,7 +159,9 @@ public class Engine
         _waveCompletedThisFrame = false;
 
         // Check if wave is completed (all enemies killed)
-        if (_waveSystem.WaveCompleted && _enemies.Count == 0)
+        // Only check if all enemies remaining in wave are defeated, not if screen is clear
+        // This prevents timing issues with death animations
+        if (_waveSystem.WaveCompleted && !_waveCompletedThisFrame)
         {
             // Apply a random buff to the player
             var buffType = _waveSystem.GetRandomBuff();
@@ -182,7 +184,9 @@ public class Engine
         }
 
         // Check for enemy spawn if we still need more enemies
+        // Don't spawn enemies if wave is completed to prevent timing issues
         if (_enemies.Count < _maxEnemies &&
+            !_waveSystem.WaveCompleted &&
             (currentTime - _lastEnemySpawn).TotalSeconds > _enemySpawnIntervalSeconds)
         {
             SpawnNewEnemy();
